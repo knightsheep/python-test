@@ -1,3 +1,6 @@
+
+# 目前的问题是仍然需要扫码登录以及不能筛选车票
+
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -11,8 +14,8 @@ class TrainTicketBot:
         self.de_time = departure_time
         self.options = Options()
         self.options.add_experimental_option('excludeSwitches', ['enable-automation'])
-        self.options.add_argument('--disable-blink-features=AutomationControlled')
-        self.options.add_argument('--disable-infobars')
+        self.options.add_argument('--disable-blink-features=AutomationControlled')# 可选，隐藏自动化特征
+        # self.options.add_argument('--disable-infobars')
         self.driver = webdriver.Chrome(self.options)
         self.driver.maximize_window()
 
@@ -33,21 +36,24 @@ class TrainTicketBot:
         self.driver.get("https://kyfw.12306.cn/otn/resources/login.html")
 
         while not self.is_element_exist('//a[@class="txt-primary underline"]'):
+            # 循环用于扫码登陆
             time.sleep(1)
 
+        # 点击用于跳转页面
         self.driver.find_element(By.XPATH, '//a[@class="txt-primary underline"]').click()
+        time.sleep(1)
 
         try:
             # 出发地站点
             self.driver.find_element(By.XPATH, '//input[@id="fromStationText"]').click()
-            self.driver.find_element(By.XPATH, '//input[@ids="fromStationText"]').send_keys(self.from_st)
+            self.driver.find_element(By.XPATH, '//input[@id="fromStationText"]').send_keys(self.from_st)
             self.driver.find_element(By.XPATH, '//span[@class="ralign"]').click()
             time.sleep(0.5)
 
             # 目的地站点
             self.driver.find_element(By.XPATH, '//input[@id="toStationText"]').click()
-            self.driver.find_element(By.XPATH, '//input[@id="toStationText"]').send_keys(self.from_st)
-            self.driver.find_element(By.XPATH, '//input[@class="ralign"]').click()
+            self.driver.find_element(By.XPATH, '//input[@id="toStationText"]').send_keys(self.to_st)
+            self.driver.find_element(By.XPATH, '//span[@class="ralign"]').click()
             time.sleep(0.5)
 
             # 出发时间
@@ -89,9 +95,9 @@ class TrainTicketBot:
 
 if __name__ == '__main__':
     # 定义出发地与目的地
-    from_station = "重庆北"
-    to_station = "成都东"
-    departure_time = "2025-10-01"
+    from_station = '重庆北'
+    to_station = '成都东'
+    departure_time = '2025-10-01'
 
 
     Test = TrainTicketBot(from_station, to_station, departure_time)
